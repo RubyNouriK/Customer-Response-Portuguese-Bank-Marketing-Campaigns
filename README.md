@@ -66,7 +66,7 @@ reduced_model <- glm(y~ job + education + contact +
                        data = data, family = binomial)
 ```
 
-*Misclassification Rate: 0.0933*
+*Misclassification Rate: 0.0933%*
 
 | Predicted / Actual | no   | yes  |
 |--------------------|------|------|
@@ -88,6 +88,24 @@ Therefore, the reduced model is selected as the final model for this logistic re
 
 **Final Model LDA:**
 
+```{r}
+lda.fit3<-lda(y~age+duration+campaign+previous+emp.var.rate+cons.price.idx+cons.conf.idx,
+              data = train_data)
+```
+*Misclassification Rate: 9.4153%*
+
+| Predicted / Actual | no   | yes  |
+|--------------------|------|------|
+| no                 | 4899 | 329  |
+| yes                | 204  | 229  |
+
+The model correctly classified $4899$ clients as not subscribing to the term deposit (True Negatives) and $229$ clients as subscribing (True Positives). However, it also misclassified $329$ clients who did not subscribe as subscribers (False Positives), and $204$ clients who actually subscribed were missed by the model (False Negatives).
+
+These results suggest that the model performs quite well in identifying clients who are unlikely to subscribe, but it struggles to accurately predict those who will subscribe. This is likely due to class imbalance, where non-subscribers dominate the dataset, even when the data split was balanced before generating the dataset split. As a result of the imbalanced data, the model is biased toward the majority class, and its ability to capture positive cases (subscribers) is limited.
+
+![image](Figures/7. Partition plot LDA.png) 
+
+![image](Figures/8. Partition plot LDA.png)
 
 
 
