@@ -86,6 +86,12 @@ Although the performance improvement in terms of misclassification is marginal, 
 
 Therefore, the reduced model is selected as the final model for this logistic regression analysis.
 
+
+### Correlation Matrix
+
+![image](![Correlation Matrix](Figures/6.%20Correlation%20Matrix.png)
+
+
 **Final Model LDA:**
 
 ```{r}
@@ -103,16 +109,74 @@ The model correctly classified $4899$ clients as not subscribing to the term dep
 
 These results suggest that the model performs quite well in identifying clients who are unlikely to subscribe, but it struggles to accurately predict those who will subscribe. This is likely due to class imbalance, where non-subscribers dominate the dataset, even when the data split was balanced before generating the dataset split. As a result of the imbalanced data, the model is biased toward the majority class, and its ability to capture positive cases (subscribers) is limited.
 
-![image](Figures/7. Partition plot LDA.png) 
+![image](Figures/7.%20Partition%20plot%20LDA.png)
 
-![image](Figures/8. Partition plot LDA.png)
-
-
+![image](Figures/8.%20Partition%20plot%20LDA.png)
 
 
 **Final Model QDA:**
 
+```{r}
+qda_reduced2 <- qda(y~ age + duration + campaign + previous
+                    + emp.var.rate + cons.price.idx + cons.conf.idx,
+                    data = train_data)
+```
 
+*Misclassification Rate: 11.1288%*
+
+| Predicted / Actual | no   | yes  |
+|--------------------|------|------|
+| no                 | 4764 | 291  |
+| yes                | 339  | 267  |
+
+The model correctly classified $4764$ clients as not subscribing to the term deposit (True Negatives) and $267$ clients as subscribing (True Positives). However, it also misclassified $291$ clients who did not subscribe as subscribers (False Positives), and $339$ clients who actually subscribed were missed by the model (False Negatives).
+
+This reduction suggests that eliminating redundant features can enhance QDA performance by reducing instability in the covariance matrices without sacrificing predictive power.
+
+1[image](Figures/9.%20Partition%20plot%20QDA.png)
+
+**Final Classification Tree Model**
+
+![image](Figures/12.%20Pruned%20Classification%20Tree%20Based%20on%20Cross-Validation.png)
+
+*Misclassification Rate: 10.2102%*
+
+| Predicted / Actual | no   | yes  |
+|--------------------|------|------|
+| no                 | 4903 | 378  |
+| yes                | 200  | 180  |
+
+The pruned classification tree model correctly identified 4,903 negative cases (clients who did not subscribe) and 180 positive cases (clients who did subscribe). However, it also produced 378 false positives (predicted as subscribers, but they were not) and 200 false negatives (predicted as non-subscribers, but they actually subscribed).From this confusion matrix, we can estimate the following performance metrics:
+
+* Accuracy: $89.8$%. This represents the proportion of correctly classified observations out of all predictions.
+
+* Precision for yes: $32.2$%. This is the proportion of correct positive predictions among all predicted positives (the true and false ones).
+ 
+* Sensitivity for yes: $47.4$%. This indicates the model’s ability to correctly identify actual subscribers $(180/(180+200))$.
+
+* Specificity is: $92.8$%. This is the true negative rate and reflects the model’s ability to correctly classify non-subscribers.(TN/Total Neg= $4903/(4903+378))$.
+
+* Misclassification rate of $10.2$%. This is estimated by all the incorrectly classified over the total predicted and it is the complement of the accuracy.
+
+Overall, the model performs well in terms of general accuracy and specificity, which is expected given the dataset’s imbalance toward non-subscribers. Although class balancing was applied before splitting the data into training and test sets, the prediction of the minority class **('yes')** remains challenging.
+
+Only $47.4$% of actual subscribers were correctly identified, which indicates poor sensitivity. This highlights the model’s limited ability to detect clients who will subscribe, which is a crucial insight in applications where identifying positive cases is a priority.
+
+
+**K-fold Cross-Validation**
+
+![image](Figures/13.%20Summary%20of%20Classification%20Models.png)
+
+Based on the $10$-fold cross-validation results, Logistic Regression (GLM) emerged as the model with the lowest misclassification rate ($9.00$%), followed closely by Linear Discriminant Analysis (LDA) with $9.1$%. These findings suggest that both models offer strong predictive performance, with GLM slightly outperforming in terms of classification accuracy.
+
+However, model evaluation should not rely solely on misclassification rates. Other performance metrics—such as precision, sensitivity, and specificity—provide a more nuanced understanding of each model's strengths and limitations, particularly in the context of marketing campaigns where the cost of false positives and false negatives can differ substantially.
+
+
+![image](Figures/14.%20Classification%20Performance%20Metrics%20Before%20Cross-Validation.png)
+
+GLM is recommended if the objective is to minimize false positives and improve overall prediction accuracy. In contrast, LDA may be more suitable when the marketing strategy emphasizes maximizing subscriber detection, accepting a higher false positive rate as a trade-off.
+
+Ultimately, the optimal model selection depends on the specific goals and resource constraints of the campaign. These performance results provide a robust basis for aligning statistical accuracy with operational effectiveness.
 
 
 ## Conclusions
